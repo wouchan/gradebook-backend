@@ -12,7 +12,8 @@ fastify.get("/users", async (request, reply) => {
     try {
         const allUsers = await db.select().from(users);
         return allUsers;
-    } catch (error) {
+    } catch (err) {
+        console.log(err);
         reply.code(500).send({ error: "Failed to fetch users" });
     }
 });
@@ -32,7 +33,8 @@ fastify.get("/users/:id", async (request, reply) => {
         }
 
         return user[0];
-    } catch (error) {
+    } catch (err) {
+        console.log(err);
         reply.code(500).send({ error: "Failed to fetch user" });
     }
 });
@@ -55,7 +57,8 @@ fastify.post("/users", async (request, reply) => {
             .returning();
 
         return newUser[0];
-    } catch (error) {
+    } catch (err) {
+        console.log(err);
         reply.code(500).send({ error: "Failed to create user" });
     }
 });
@@ -80,7 +83,8 @@ fastify.put("/users/:id", async (request, reply) => {
         }
 
         return updatedUser[0];
-    } catch (error) {
+    } catch (err) {
+        console.log(err);
         reply.code(500).send({ error: "Failed to update user" });
     }
 });
@@ -99,7 +103,8 @@ fastify.delete("/users/:id", async (request, reply) => {
         }
 
         return { message: "User deleted successfully" };
-    } catch (error) {
+    } catch (err) {
+        console.log(err);
         reply.code(500).send({ error: "Failed to delete user" });
     }
 });
