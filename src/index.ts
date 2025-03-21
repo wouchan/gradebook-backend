@@ -1,41 +1,120 @@
 import "dotenv/config";
-import { drizzle } from "drizzle-orm/node-postgres";
 import { eq } from "drizzle-orm";
-import { usersTable } from "./db/schema";
+import { users } from "./db/schema";
+import { db } from "./db";
+import Fastify from "fastify";
 
-const db = drizzle(process.env.DATABASE_URL!);
+const fastify = Fastify({
+    logger: true,
+});
 
-async function main() {
-    const user: typeof usersTable.$inferInsert = {
-        name: "John",
-        age: 30,
-        email: "john@example.com",
+fastify.get("/users", async (request, reply) => {
+    try {
+        const allUsers = await db.select().from(users);
+        return allUsers;
+    } catch (error) {
+        reply.code(500).send({ error: "Failed to fetch users" });
+    }
+});
+
+fastify.get("/users/:id", async (request, reply) => {
+    const { id } = request.params as { id: string };
+
+    try {
+        const user = await db
+            .select()
+            .from(users)
+            .where(eq(users.id, parseInt(id)))
+            .limit(1);
+
+        if (user.length === 0) {
+            return reply.code(404).send({ error: "User not found" });
+        }
+
+        return user[0];
+    } catch (error) {
+        reply.code(500).send({ error: "Failed to fetch user" });
+    }
+});
+
+fastify.post("/users", async (request, reply) => {
+    const { name, age, email } = request.body as {
+        name: string;
+        age: number;
+        email: string;
     };
 
-    await db.insert(usersTable).values(user);
-    console.log("New user created!");
+    try {
+        const newUser = await db
+            .insert(users)
+            .values({
+                name,
+                age,
+                email,
+            })
+            .returning();
 
-    const users = await db.select().from(usersTable);
-    console.log("Getting all users from the database: ", users);
-    /*
-  const users: {
-    id: number;
-    name: string;
-    age: number;
-    email: string;
-  }[]
-  */
+        return newUser[0];
+    } catch (error) {
+        reply.code(500).send({ error: "Failed to create user" });
+    }
+});
 
-    await db
-        .update(usersTable)
-        .set({
-            age: 31,
-        })
-        .where(eq(usersTable.email, user.email));
-    console.log("User info updated!");
+fastify.put("/users/:id", async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const { name, age, email } = request.body as {
+        name: string;
+        age: number;
+        email: string;
+    };
 
-    await db.delete(usersTable).where(eq(usersTable.email, user.email));
-    console.log("User deleted!");
-}
+    try {
+        const updatedUser = await db
+            .update(users)
+            .set({ name, age, email })
+            .where(eq(users.id, parseInt(id)))
+            .returning();
 
-main();
+        if (updatedUser.length === 0) {
+            return reply.code(404).send({ error: "User not found" });
+        }
+
+        return updatedUser[0];
+    } catch (error) {
+        reply.code(500).send({ error: "Failed to update user" });
+    }
+});
+
+fastify.delete("/users/:id", async (request, reply) => {
+    const { id } = request.params as { id: string };
+
+    try {
+        const deletedUser = await db
+            .delete(users)
+            .where(eq(users.id, parseInt(id)))
+            .returning();
+
+        if (deletedUser.length === 0) {
+            return reply.code(404).send({ error: "User not found" });
+        }
+
+        return { message: "User deleted successfully" };
+    } catch (error) {
+        reply.code(500).send({ error: "Failed to delete user" });
+    }
+});
+
+const start = async () => {
+    try {
+        await fastify.listen({
+            port: Number(process.env.PORT) || 3000,
+            host: "0.0.0.0",
+        });
+        console.log(`Server is running on port ${process.env.PORT || 3000}`);
+    } catch (err) {
+        fastify.log.error(err);
+        process.exit(1);
+    }
+};
+
+start();
