@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { eq } from "drizzle-orm";
-import { users } from "./db/schema";
+import { students } from "./db/schema";
 import { db } from "./db";
 import Fastify from "fastify";
 
@@ -8,104 +8,101 @@ const fastify = Fastify({
     logger: true,
 });
 
-fastify.get("/users", async (request, reply) => {
+fastify.get("/students", async (request, reply) => {
     try {
-        const allUsers = await db.select().from(users);
-        return allUsers;
+        const allStudents = await db.select().from(students);
+        return allStudents;
     } catch (err) {
         console.log(err);
-        reply.code(500).send({ error: "Failed to fetch users" });
+        reply.code(500).send({ error: "Failed to fetch students" });
     }
 });
 
-fastify.get("/users/:id", async (request, reply) => {
+fastify.get("/students/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
 
     try {
         const user = await db
             .select()
-            .from(users)
-            .where(eq(users.id, parseInt(id)))
+            .from(students)
+            .where(eq(students.id, id))
             .limit(1);
 
         if (user.length === 0) {
-            return reply.code(404).send({ error: "User not found" });
+            return reply.code(404).send({ error: "Student not found" });
         }
 
         return user[0];
     } catch (err) {
         console.log(err);
-        reply.code(500).send({ error: "Failed to fetch user" });
+        reply.code(500).send({ error: "Failed to fetch student" });
     }
 });
 
-fastify.post("/users", async (request, reply) => {
-    const { name, age, email } = request.body as {
+fastify.post("/students", async (request, reply) => {
+    const { name, email } = request.body as {
         name: string;
-        age: number;
         email: string;
     };
 
     try {
-        const newUser = await db
-            .insert(users)
+        const newStudent = await db
+            .insert(students)
             .values({
                 name,
-                age,
                 email,
             })
             .returning();
 
-        return newUser[0];
+        return newStudent[0];
     } catch (err) {
         console.log(err);
-        reply.code(500).send({ error: "Failed to create user" });
+        reply.code(500).send({ error: "Failed to create student" });
     }
 });
 
-fastify.put("/users/:id", async (request, reply) => {
+fastify.put("/students/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
-    const { name, age, email } = request.body as {
+    const { name, email } = request.body as {
         name: string;
-        age: number;
         email: string;
     };
 
     try {
-        const updatedUser = await db
-            .update(users)
-            .set({ name, age, email })
-            .where(eq(users.id, parseInt(id)))
+        const updatedStudent = await db
+            .update(students)
+            .set({ name, email })
+            .where(eq(students.id, id))
             .returning();
 
-        if (updatedUser.length === 0) {
-            return reply.code(404).send({ error: "User not found" });
+        if (updatedStudent.length === 0) {
+            return reply.code(404).send({ error: "Student not found" });
         }
 
-        return updatedUser[0];
+        return updatedStudent[0];
     } catch (err) {
         console.log(err);
-        reply.code(500).send({ error: "Failed to update user" });
+        reply.code(500).send({ error: "Failed to update student" });
     }
 });
 
-fastify.delete("/users/:id", async (request, reply) => {
+fastify.delete("/students/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
 
     try {
-        const deletedUser = await db
-            .delete(users)
-            .where(eq(users.id, parseInt(id)))
+        const deletedStudent = await db
+            .delete(students)
+            .where(eq(students.id, id))
             .returning();
 
-        if (deletedUser.length === 0) {
-            return reply.code(404).send({ error: "User not found" });
+        if (deletedStudent.length === 0) {
+            return reply.code(404).send({ error: "Student not found" });
         }
 
-        return { message: "User deleted successfully" };
+        return { message: "Student deleted successfully" };
     } catch (err) {
         console.log(err);
-        reply.code(500).send({ error: "Failed to delete user" });
+        reply.code(500).send({ error: "Failed to delete student" });
     }
 });
 
