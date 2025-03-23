@@ -1,21 +1,21 @@
-import { FastifyInstance } from "fastify";
+import { Express } from "express";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { classes } from "../db/schema";
 
-export default function registerClassesRoutes(fastify: FastifyInstance) {
-    fastify.get("/classes", async (request, reply) => {
+export default function registerClassesRoutes(app: Express) {
+    app.get("/classes", async (req, res) => {
         try {
             const allClasses = await db.select().from(classes);
-            return allClasses;
+            res.send(allClasses);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to fetch classes" });
+            res.status(500).send({ error: "Failed to fetch classes" });
         }
     });
 
-    fastify.get("/classes/:id", async (request, reply) => {
-        const { id } = request.params as { id: string };
+    app.get("/classes/:id", async (req, res) => {
+        const { id } = req.params as { id: string };
 
         try {
             const schoolClass = await db
@@ -25,18 +25,19 @@ export default function registerClassesRoutes(fastify: FastifyInstance) {
                 .limit(1);
 
             if (schoolClass.length === 0) {
-                return reply.code(404).send({ error: "Class not found" });
+                res.status(404).send({ error: "Class not found" });
+                return;
             }
 
-            return schoolClass[0];
+            res.send(schoolClass[0]);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to fetch class" });
+            res.status(500).send({ error: "Failed to fetch class" });
         }
     });
 
-    fastify.post("/classes", async (request, reply) => {
-        const { name } = request.body as {
+    app.post("/classes", async (req, res) => {
+        const { name } = req.body as {
             name: string;
         };
 
@@ -48,16 +49,16 @@ export default function registerClassesRoutes(fastify: FastifyInstance) {
                 })
                 .returning();
 
-            return newClass[0];
+            res.send(newClass[0]);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to create class" });
+            res.status(500).send({ error: "Failed to create class" });
         }
     });
 
-    fastify.put("/classes/:id", async (request, reply) => {
-        const { id } = request.params as { id: string };
-        const { name } = request.body as {
+    app.put("/classes/:id", async (req, res) => {
+        const { id } = req.params as { id: string };
+        const { name } = req.body as {
             name: string;
         };
 
@@ -69,18 +70,19 @@ export default function registerClassesRoutes(fastify: FastifyInstance) {
                 .returning();
 
             if (updatedClass.length === 0) {
-                return reply.code(404).send({ error: "Class not found" });
+                res.status(404).send({ error: "Class not found" });
+                return;
             }
 
-            return updatedClass[0];
+            res.send(updatedClass[0]);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to update class" });
+            res.status(500).send({ error: "Failed to update class" });
         }
     });
 
-    fastify.delete("/classes/:id", async (request, reply) => {
-        const { id } = request.params as { id: string };
+    app.delete("/classes/:id", async (req, res) => {
+        const { id } = req.params as { id: string };
 
         try {
             const deletedClass = await db
@@ -89,13 +91,14 @@ export default function registerClassesRoutes(fastify: FastifyInstance) {
                 .returning();
 
             if (deletedClass.length === 0) {
-                return reply.code(404).send({ error: "Class not found" });
+                res.status(404).send({ error: "Class not found" });
+                return;
             }
 
-            return { message: "Class deleted successfully" };
+            res.send({ message: "Class deleted successfully" });
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to delete class" });
+            res.status(500).send({ error: "Failed to delete class" });
         }
     });
 }

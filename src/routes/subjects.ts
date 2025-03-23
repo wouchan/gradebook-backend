@@ -1,21 +1,21 @@
-import { FastifyInstance } from "fastify";
+import { Express } from "express";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { subjects } from "../db/schema";
 
-export default function registerSubjectsRoutes(fastify: FastifyInstance) {
-    fastify.get("/subjects", async (request, reply) => {
+export default function registerSubjectsRoutes(app: Express) {
+    app.get("/subjects", async (req, res) => {
         try {
             const allSubjects = await db.select().from(subjects);
-            return allSubjects;
+            res.send(allSubjects);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to fetch subjects" });
+            res.status(500).send({ error: "Failed to fetch subjects" });
         }
     });
 
-    fastify.get("/subjects/:id", async (request, reply) => {
-        const { id } = request.params as { id: string };
+    app.get("/subjects/:id", async (req, res) => {
+        const { id } = req.params as { id: string };
 
         try {
             const subject = await db
@@ -25,18 +25,19 @@ export default function registerSubjectsRoutes(fastify: FastifyInstance) {
                 .limit(1);
 
             if (subject.length === 0) {
-                return reply.code(404).send({ error: "Subject not found" });
+                res.status(404).send({ error: "Subject not found" });
+                return;
             }
 
-            return subject[0];
+            res.send(subject[0]);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to fetch subject" });
+            res.status(500).send({ error: "Failed to fetch subject" });
         }
     });
 
-    fastify.post("/subjects", async (request, reply) => {
-        const { name } = request.body as {
+    app.post("/subjects", async (req, res) => {
+        const { name } = req.body as {
             name: string;
         };
 
@@ -48,16 +49,16 @@ export default function registerSubjectsRoutes(fastify: FastifyInstance) {
                 })
                 .returning();
 
-            return newSubject[0];
+            res.send(newSubject[0]);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to create subject" });
+            res.status(500).send({ error: "Failed to create subject" });
         }
     });
 
-    fastify.put("/subjects/:id", async (request, reply) => {
-        const { id } = request.params as { id: string };
-        const { name } = request.body as {
+    app.put("/subjects/:id", async (req, res) => {
+        const { id } = req.params as { id: string };
+        const { name } = req.body as {
             name: string;
         };
 
@@ -69,18 +70,19 @@ export default function registerSubjectsRoutes(fastify: FastifyInstance) {
                 .returning();
 
             if (updatedSubject.length === 0) {
-                return reply.code(404).send({ error: "Subject not found" });
+                res.status(404).send({ error: "Subject not found" });
+                return;
             }
 
-            return updatedSubject[0];
+            res.send(updatedSubject[0]);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to update subject" });
+            res.status(500).send({ error: "Failed to update subject" });
         }
     });
 
-    fastify.delete("/subjects/:id", async (request, reply) => {
-        const { id } = request.params as { id: string };
+    app.delete("/subjects/:id", async (req, res) => {
+        const { id } = req.params as { id: string };
 
         try {
             const deletedSubject = await db
@@ -89,13 +91,14 @@ export default function registerSubjectsRoutes(fastify: FastifyInstance) {
                 .returning();
 
             if (deletedSubject.length === 0) {
-                return reply.code(404).send({ error: "Subject not found" });
+                res.status(404).send({ error: "Subject not found" });
+                return;
             }
 
-            return { message: "Subject deleted successfully" };
+            res.send({ message: "Subject deleted successfully" });
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to delete subject" });
+            res.status(500).send({ error: "Failed to delete subject" });
         }
     });
 }

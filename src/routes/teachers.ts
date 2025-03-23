@@ -1,21 +1,21 @@
-import { FastifyInstance } from "fastify";
+import { Express } from "express";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { teachers } from "../db/schema";
 
-export default function registerTeacherRoutes(fastify: FastifyInstance) {
-    fastify.get("/teachers", async (request, reply) => {
+export default function registerTeacherRoutes(app: Express) {
+    app.get("/teachers", async (req, res) => {
         try {
             const allTeachers = await db.select().from(teachers);
-            return allTeachers;
+            res.send(allTeachers);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to fetch teachers" });
+            res.status(500).send({ error: "Failed to fetch teachers" });
         }
     });
 
-    fastify.get("/teachers/:id", async (request, reply) => {
-        const { id } = request.params as { id: string };
+    app.get("/teachers/:id", async (req, res) => {
+        const { id } = req.params as { id: string };
 
         try {
             const teacher = await db
@@ -25,18 +25,19 @@ export default function registerTeacherRoutes(fastify: FastifyInstance) {
                 .limit(1);
 
             if (teacher.length === 0) {
-                return reply.code(404).send({ error: "Teacher not found" });
+                res.status(404).send({ error: "Teacher not found" });
+                return;
             }
 
-            return teacher[0];
+            res.send(teacher[0]);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to fetch teacher" });
+            res.status(500).send({ error: "Failed to fetch teacher" });
         }
     });
 
-    fastify.post("/teachers", async (request, reply) => {
-        const { name, email } = request.body as {
+    app.post("/teachers", async (req, res) => {
+        const { name, email } = req.body as {
             name: string;
             email: string;
         };
@@ -50,16 +51,16 @@ export default function registerTeacherRoutes(fastify: FastifyInstance) {
                 })
                 .returning();
 
-            return newTeacher[0];
+            res.send(newTeacher[0]);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to create teacher" });
+            res.status(500).send({ error: "Failed to create teacher" });
         }
     });
 
-    fastify.put("/teachers/:id", async (request, reply) => {
-        const { id } = request.params as { id: string };
-        const { name, email } = request.body as {
+    app.put("/teachers/:id", async (req, res) => {
+        const { id } = req.params as { id: string };
+        const { name, email } = req.body as {
             name: string;
             email: string;
         };
@@ -72,18 +73,19 @@ export default function registerTeacherRoutes(fastify: FastifyInstance) {
                 .returning();
 
             if (updatedTeacher.length === 0) {
-                return reply.code(404).send({ error: "Teacher not found" });
+                res.status(404).send({ error: "Teacher not found" });
+                return;
             }
 
-            return updatedTeacher[0];
+            res.send(updatedTeacher[0]);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to update teacher" });
+            res.status(500).send({ error: "Failed to update teacher" });
         }
     });
 
-    fastify.delete("/teachers/:id", async (request, reply) => {
-        const { id } = request.params as { id: string };
+    app.delete("/teachers/:id", async (req, res) => {
+        const { id } = req.params as { id: string };
 
         try {
             const deletedTeacher = await db
@@ -92,13 +94,14 @@ export default function registerTeacherRoutes(fastify: FastifyInstance) {
                 .returning();
 
             if (deletedTeacher.length === 0) {
-                return reply.code(404).send({ error: "Teacher not found" });
+                res.status(404).send({ error: "Teacher not found" });
+                return;
             }
 
-            return { message: "Teacher deleted successfully" };
+            res.send({ message: "Teacher deleted successfully" });
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to delete teacher" });
+            res.status(500).send({ error: "Failed to delete teacher" });
         }
     });
 }

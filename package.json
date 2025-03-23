@@ -15,12 +15,13 @@
     "dependencies": {
         "dotenv": "^16.4.7",
         "drizzle-orm": "^0.41.0",
-        "fastify": "^5.2.1",
+        "express": "^5.0.1",
         "pg": "^8.14.1"
     },
     "devDependencies": {
         "@eslint/js": "^9.23.0",
         "@tsconfig/node23": "^23.0.0",
+        "@types/express": "^5.0.1",
         "@types/pg": "^8.11.11",
         "drizzle-kit": "^0.30.5",
         "eslint": "^9.22.0",

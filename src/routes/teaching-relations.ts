@@ -1,59 +1,55 @@
-import { FastifyInstance } from "fastify";
+import { Express } from "express";
 import { eq, and } from "drizzle-orm";
 import { db } from "../db";
 import { teachingRelations } from "../db/schema";
 
-export default function registerClassesRoutes(fastify: FastifyInstance) {
-    fastify.get("/teaching-relations", async (request, reply) => {
+export default function registerClassesRoutes(app: Express) {
+    app.get("/teaching-relations", async (req, res) => {
         try {
             const allClasses = await db.select().from(teachingRelations);
-            return allClasses;
+            res.send(allClasses);
         } catch (err) {
             console.log(err);
-            reply
-                .code(500)
-                .send({ error: "Failed to fetch teaching relations" });
+            res.status(500).send({
+                error: "Failed to fetch teaching relations",
+            });
         }
     });
 
-    fastify.get(
-        "/teaching-relations/:classId/:subjectId",
-        async (request, reply) => {
-            const { classId, subjectId } = request.params as {
-                classId: string;
-                subjectId: string;
-            };
+    app.get("/teaching-relations/:classId/:subjectId", async (req, res) => {
+        const { classId, subjectId } = req.params as {
+            classId: string;
+            subjectId: string;
+        };
 
-            try {
-                const techingRelation = await db
-                    .select()
-                    .from(teachingRelations)
-                    .where(
-                        and(
-                            eq(teachingRelations.classId, classId),
-                            eq(teachingRelations.subjectId, subjectId)
-                        )
+        try {
+            const techingRelation = await db
+                .select()
+                .from(teachingRelations)
+                .where(
+                    and(
+                        eq(teachingRelations.classId, classId),
+                        eq(teachingRelations.subjectId, subjectId)
                     )
-                    .limit(1);
+                )
+                .limit(1);
 
-                if (techingRelation.length === 0) {
-                    return reply
-                        .code(404)
-                        .send({ error: "Teaching relation not found" });
-                }
-
-                return techingRelation[0];
-            } catch (err) {
-                console.log(err);
-                reply
-                    .code(500)
-                    .send({ error: "Failed to fetch teaching relation" });
+            if (techingRelation.length === 0) {
+                res.status(404).send({ error: "Teaching relation not found" });
+                return;
             }
-        }
-    );
 
-    fastify.post("/teaching-relations", async (request, reply) => {
-        const { classId, subjectId, teacherId } = request.body as {
+            res.send(techingRelation[0]);
+        } catch (err) {
+            console.log(err);
+            res.status(500).send({
+                error: "Failed to fetch teaching relation",
+            });
+        }
+    });
+
+    app.post("/teaching-relations", async (req, res) => {
+        const { classId, subjectId, teacherId } = req.body as {
             classId: string;
             subjectId: string;
             teacherId: string;
@@ -69,87 +65,79 @@ export default function registerClassesRoutes(fastify: FastifyInstance) {
                 })
                 .returning();
 
-            return newTeachingRelation[0];
+            res.send(newTeachingRelation[0]);
         } catch (err) {
             console.log(err);
-            reply
-                .code(500)
-                .send({ error: "Failed to create teaching relation" });
+            res.status(500).send({
+                error: "Failed to create teaching relation",
+            });
         }
     });
 
-    fastify.put(
-        "/teaching-relations/:classId/:subjectId",
-        async (request, reply) => {
-            const { classId, subjectId } = request.params as {
-                classId: string;
-                subjectId: string;
-            };
+    app.put("/teaching-relations/:classId/:subjectId", async (req, res) => {
+        const { classId, subjectId } = req.params as {
+            classId: string;
+            subjectId: string;
+        };
 
-            const { teacherId } = request.body as {
-                teacherId: string;
-            };
+        const { teacherId } = req.body as {
+            teacherId: string;
+        };
 
-            try {
-                const updatedTeachingRelation = await db
-                    .update(teachingRelations)
-                    .set({ teacherId })
-                    .where(
-                        and(
-                            eq(teachingRelations.classId, classId),
-                            eq(teachingRelations.subjectId, subjectId)
-                        )
+        try {
+            const updatedTeachingRelation = await db
+                .update(teachingRelations)
+                .set({ teacherId })
+                .where(
+                    and(
+                        eq(teachingRelations.classId, classId),
+                        eq(teachingRelations.subjectId, subjectId)
                     )
-                    .returning();
+                )
+                .returning();
 
-                if (updatedTeachingRelation.length === 0) {
-                    return reply
-                        .code(404)
-                        .send({ error: "Teaching relation not found" });
-                }
-
-                return updatedTeachingRelation[0];
-            } catch (err) {
-                console.log(err);
-                reply
-                    .code(500)
-                    .send({ error: "Failed to update teaching relation" });
+            if (updatedTeachingRelation.length === 0) {
+                res.status(404).send({ error: "Teaching relation not found" });
+                return;
             }
+
+            res.send(updatedTeachingRelation[0]);
+        } catch (err) {
+            console.log(err);
+            res.status(500).send({
+                error: "Failed to update teaching relation",
+            });
         }
-    );
+    });
 
-    fastify.delete(
-        "/teaching-relations/:classId/:subjectId",
-        async (request, reply) => {
-            const { classId, subjectId } = request.params as {
-                classId: string;
-                subjectId: string;
-            };
+    app.delete("/teaching-relations/:classId/:subjectId", async (req, res) => {
+        const { classId, subjectId } = req.params as {
+            classId: string;
+            subjectId: string;
+        };
 
-            try {
-                const deletedTeachingRelation = await db
-                    .delete(teachingRelations)
-                    .where(
-                        and(
-                            eq(teachingRelations.classId, classId),
-                            eq(teachingRelations.subjectId, subjectId)
-                        )
+        try {
+            const deletedTeachingRelation = await db
+                .delete(teachingRelations)
+                .where(
+                    and(
+                        eq(teachingRelations.classId, classId),
+                        eq(teachingRelations.subjectId, subjectId)
                     )
-                    .returning();
+                )
+                .returning();
 
-                if (deletedTeachingRelation.length === 0) {
-                    return reply
-                        .code(404)
-                        .send({ error: "Teaching relation not found" });
-                }
-
-                return { message: "Teaching relation deleted successfully" };
-            } catch (err) {
-                console.log(err);
-                reply
-                    .code(500)
-                    .send({ error: "Failed to delete teaching relation" });
+            if (deletedTeachingRelation.length === 0) {
+                res.status(404).send({ error: "Teaching relation not found" });
+                return;
             }
+
+            res.send({ message: "Teaching relation deleted successfully" });
+        } catch (err) {
+            console.log(err);
+            res.status(500).send({
+                error: "Failed to delete teaching relation",
+            });
         }
-    );
+    });
 }

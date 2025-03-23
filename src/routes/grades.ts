@@ -1,21 +1,21 @@
-import { FastifyInstance } from "fastify";
+import { Express } from "express";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { grades } from "../db/schema";
 
-export default function registerGradesRoutes(fastify: FastifyInstance) {
-    fastify.get("/grades", async (request, reply) => {
+export default function registerGradesRoutes(app: Express) {
+    app.get("/grades", async (req, res) => {
         try {
             const allGrades = await db.select().from(grades);
-            return allGrades;
+            res.send(allGrades);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to fetch grades" });
+            res.status(500).send({ error: "Failed to fetch grades" });
         }
     });
 
-    fastify.get("/grades/:id", async (request, reply) => {
-        const { id } = request.params as { id: string };
+    app.get("/grades/:id", async (req, res) => {
+        const { id } = req.params as { id: string };
 
         try {
             const grade = await db
@@ -25,18 +25,19 @@ export default function registerGradesRoutes(fastify: FastifyInstance) {
                 .limit(1);
 
             if (grade.length === 0) {
-                return reply.code(404).send({ error: "Grade not found" });
+                res.status(404).send({ error: "Grade not found" });
+                return;
             }
 
-            return grade[0];
+            res.send(grade[0]);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to fetch grade" });
+            res.status(500).send({ error: "Failed to fetch grade" });
         }
     });
 
-    fastify.post("/grades", async (request, reply) => {
-        const { studentId, subjectId, value } = request.body as {
+    app.post("/grades", async (req, res) => {
+        const { studentId, subjectId, value } = req.body as {
             studentId: string;
             subjectId: string;
             value: number;
@@ -52,16 +53,16 @@ export default function registerGradesRoutes(fastify: FastifyInstance) {
                 })
                 .returning();
 
-            return newGrade[0];
+            res.send(newGrade[0]);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to create grade" });
+            res.status(500).send({ error: "Failed to create grade" });
         }
     });
 
-    fastify.put("/grades/:id", async (request, reply) => {
-        const { id } = request.params as { id: string };
-        const { studentId, subjectId, value } = request.body as {
+    app.put("/grades/:id", async (req, res) => {
+        const { id } = req.params as { id: string };
+        const { studentId, subjectId, value } = req.body as {
             studentId: string;
             subjectId: string;
             value: number;
@@ -75,18 +76,19 @@ export default function registerGradesRoutes(fastify: FastifyInstance) {
                 .returning();
 
             if (updatedGrade.length === 0) {
-                return reply.code(404).send({ error: "Grade not found" });
+                res.status(404).send({ error: "Grade not found" });
+                return;
             }
 
-            return updatedGrade[0];
+            res.send(updatedGrade[0]);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to update grade" });
+            res.status(500).send({ error: "Failed to update grade" });
         }
     });
 
-    fastify.delete("/grades/:id", async (request, reply) => {
-        const { id } = request.params as { id: string };
+    app.delete("/grades/:id", async (req, res) => {
+        const { id } = req.params as { id: string };
 
         try {
             const deletedGrade = await db
@@ -95,13 +97,14 @@ export default function registerGradesRoutes(fastify: FastifyInstance) {
                 .returning();
 
             if (deletedGrade.length === 0) {
-                return reply.code(404).send({ error: "Grade not found" });
+                res.status(404).send({ error: "Grade not found" });
+                return;
             }
 
-            return { message: "Grade deleted successfully" };
+            res.send({ message: "Grade deleted successfully" });
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to delete grade" });
+            res.status(500).send({ error: "Failed to delete grade" });
         }
     });
 }

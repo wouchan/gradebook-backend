@@ -1,21 +1,21 @@
-import { FastifyInstance } from "fastify";
+import { Express } from "express";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { students } from "../db/schema";
 
-export default function registerStudentRoutes(fastify: FastifyInstance) {
-    fastify.get("/students", async (request, reply) => {
+export default function registerStudentRoutes(app: Express) {
+    app.get("/students", async (req, res) => {
         try {
             const allStudents = await db.select().from(students);
-            return allStudents;
+            res.send(allStudents);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to fetch students" });
+            res.status(500).send({ error: "Failed to fetch students" });
         }
     });
 
-    fastify.get("/students/:id", async (request, reply) => {
-        const { id } = request.params as { id: string };
+    app.get("/students/:id", async (req, res) => {
+        const { id } = req.params as { id: string };
 
         try {
             const student = await db
@@ -25,18 +25,19 @@ export default function registerStudentRoutes(fastify: FastifyInstance) {
                 .limit(1);
 
             if (student.length === 0) {
-                return reply.code(404).send({ error: "Student not found" });
+                res.status(404).send({ error: "Student not found" });
+                return;
             }
 
-            return student[0];
+            res.send(student[0]);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to fetch student" });
+            res.status(500).send({ error: "Failed to fetch student" });
         }
     });
 
-    fastify.post("/students", async (request, reply) => {
-        const { name, email } = request.body as {
+    app.post("/students", async (req, res) => {
+        const { name, email } = req.body as {
             name: string;
             email: string;
         };
@@ -50,16 +51,16 @@ export default function registerStudentRoutes(fastify: FastifyInstance) {
                 })
                 .returning();
 
-            return newStudent[0];
+            res.send(newStudent[0]);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to create student" });
+            res.status(500).send({ error: "Failed to create student" });
         }
     });
 
-    fastify.put("/students/:id", async (request, reply) => {
-        const { id } = request.params as { id: string };
-        const { name, email } = request.body as {
+    app.put("/students/:id", async (req, res) => {
+        const { id } = req.params as { id: string };
+        const { name, email } = req.body as {
             name: string;
             email: string;
         };
@@ -72,18 +73,19 @@ export default function registerStudentRoutes(fastify: FastifyInstance) {
                 .returning();
 
             if (updatedStudent.length === 0) {
-                return reply.code(404).send({ error: "Student not found" });
+                res.status(404).send({ error: "Student not found" });
+                return;
             }
 
-            return updatedStudent[0];
+            res.send(updatedStudent[0]);
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to update student" });
+            res.status(500).send({ error: "Failed to update student" });
         }
     });
 
-    fastify.delete("/students/:id", async (request, reply) => {
-        const { id } = request.params as { id: string };
+    app.delete("/students/:id", async (req, res) => {
+        const { id } = req.params as { id: string };
 
         try {
             const deletedStudent = await db
@@ -92,13 +94,13 @@ export default function registerStudentRoutes(fastify: FastifyInstance) {
                 .returning();
 
             if (deletedStudent.length === 0) {
-                return reply.code(404).send({ error: "Student not found" });
+                res.status(404).send({ error: "Student not found" });
             }
 
-            return { message: "Student deleted successfully" };
+            res.send({ message: "Student deleted successfully" });
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Failed to delete student" });
+            res.status(500).send({ error: "Failed to delete student" });
         }
     });
 }

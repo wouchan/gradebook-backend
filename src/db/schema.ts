@@ -10,33 +10,33 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const students = pgTable("students", {
-    id: uuid().defaultRandom().primaryKey(),
-    name: text().notNull(),
-    email: text().notNull().unique(),
+    id: uuid("id").defaultRandom().primaryKey(),
+    name: text("name").notNull(),
+    email: text("email").notNull().unique(),
 });
 
 export const teachers = pgTable("teachers", {
-    id: uuid().defaultRandom().primaryKey(),
-    name: text().notNull(),
-    email: text().notNull().unique(),
+    id: uuid("id").defaultRandom().primaryKey(),
+    name: text("name").notNull(),
+    email: text("email").notNull().unique(),
 });
 
 export const classes = pgTable("classes", {
-    id: uuid().defaultRandom().primaryKey(),
-    name: text().notNull().unique(),
+    id: uuid("id").defaultRandom().primaryKey(),
+    name: text("name").notNull().unique(),
 });
 
 export const subjects = pgTable("subjects", {
-    id: uuid().defaultRandom().primaryKey(),
-    name: text().notNull().unique(),
+    id: uuid("id").defaultRandom().primaryKey(),
+    name: text("name").notNull().unique(),
 });
 
 export const teachingRelations = pgTable(
     "teaching_relations",
     {
-        classId: uuid().references(() => classes.id),
-        subjectId: uuid().references(() => subjects.id),
-        teacherId: uuid().references(() => teachers.id),
+        classId: uuid("class_id").references(() => classes.id),
+        subjectId: uuid("subject_id").references(() => subjects.id),
+        teacherId: uuid("teacher_id").references(() => teachers.id),
     },
     (table) => [primaryKey({ columns: [table.classId, table.subjectId] })]
 );
@@ -44,12 +44,12 @@ export const teachingRelations = pgTable(
 export const grades = pgTable(
     "grades",
     {
-        id: uuid().defaultRandom().primaryKey(),
-        studentId: uuid().references(() => students.id),
-        subjectId: uuid().references(() => subjects.id),
-        value: integer().notNull(),
-        createdAt: timestamp().defaultNow().notNull(),
-        updatedAt: timestamp().defaultNow().notNull(),
+        id: uuid("id").defaultRandom().primaryKey(),
+        studentId: uuid("student_id").references(() => students.id),
+        subjectId: uuid("subject_id").references(() => subjects.id),
+        value: integer("value").notNull(),
+        createdAt: timestamp("created_at").defaultNow().notNull(),
+        updatedAt: timestamp("updated_at").defaultNow().notNull(),
     },
     (table) => [
         check("value_check_min_one", sql`${table.value} >= 1`),
