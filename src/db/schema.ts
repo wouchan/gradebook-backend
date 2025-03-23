@@ -31,8 +31,8 @@ export const subjects = pgTable("subjects", {
     name: text().notNull().unique(),
 });
 
-export const classSubjectTeachers = pgTable(
-    "class_subject_teachers",
+export const teachingRelations = pgTable(
+    "teaching_relations",
     {
         classId: uuid().references(() => classes.id),
         subjectId: uuid().references(() => subjects.id),
