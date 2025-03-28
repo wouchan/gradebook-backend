@@ -21,7 +21,7 @@ export default function registerStudentRoutes(app: Express) {
             const student = await db
                 .select()
                 .from(students)
-                .where(eq(students.id, id))
+                .where(eq(students.id, parseInt(id)))
                 .limit(1);
 
             if (student.length === 0) {
@@ -69,7 +69,7 @@ export default function registerStudentRoutes(app: Express) {
             const updatedStudent = await db
                 .update(students)
                 .set({ name, email })
-                .where(eq(students.id, id))
+                .where(eq(students.id, parseInt(id)))
                 .returning();
 
             if (updatedStudent.length === 0) {
@@ -90,7 +90,7 @@ export default function registerStudentRoutes(app: Express) {
         try {
             const deletedStudent = await db
                 .delete(students)
-                .where(eq(students.id, id))
+                .where(eq(students.id, parseInt(id)))
                 .returning();
 
             if (deletedStudent.length === 0) {
