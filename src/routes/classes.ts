@@ -21,7 +21,7 @@ export default function registerClassesRoutes(app: Express) {
             const schoolClass = await db
                 .select()
                 .from(classes)
-                .where(eq(classes.id, id))
+                .where(eq(classes.id, parseInt(id)))
                 .limit(1);
 
             if (schoolClass.length === 0) {
@@ -66,7 +66,7 @@ export default function registerClassesRoutes(app: Express) {
             const updatedClass = await db
                 .update(classes)
                 .set({ name })
-                .where(eq(classes.id, id))
+                .where(eq(classes.id, parseInt(id)))
                 .returning();
 
             if (updatedClass.length === 0) {
@@ -87,7 +87,7 @@ export default function registerClassesRoutes(app: Express) {
         try {
             const deletedClass = await db
                 .delete(classes)
-                .where(eq(classes.id, id))
+                .where(eq(classes.id, parseInt(id)))
                 .returning();
 
             if (deletedClass.length === 0) {

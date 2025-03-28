@@ -13,7 +13,7 @@ export const students = pgTable("students", {
     id: serial("id").primaryKey(),
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
-    class: serial("class_id")
+    classId: serial("class_id")
         .references(() => classes.id)
         .notNull(),
 });
@@ -41,7 +41,7 @@ export const teachingRelations = pgTable(
         subjectId: serial("subject_id").references(() => subjects.id),
         teacherId: serial("teacher_id").references(() => teachers.id),
     },
-    (table) => [primaryKey({ columns: [table.classId, table.subjectId] })]
+    (table) => [primaryKey({ columns: [table.classId, table.subjectId] })],
 );
 
 export const grades = pgTable(
@@ -61,5 +61,5 @@ export const grades = pgTable(
     (table) => [
         check("value_check_min_one", sql`${table.value} >= 1`),
         check("value_check_max_six", sql`${table.value} <= 6`),
-    ]
+    ],
 );

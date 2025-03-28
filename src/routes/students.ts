@@ -37,9 +37,10 @@ export default function registerStudentRoutes(app: Express) {
     });
 
     app.post("/students", async (req, res) => {
-        const { name, email } = req.body as {
+        const { name, email, classId } = req.body as {
             name: string;
             email: string;
+            classId: number;
         };
 
         try {
@@ -48,6 +49,7 @@ export default function registerStudentRoutes(app: Express) {
                 .values({
                     name,
                     email,
+                    classId,
                 })
                 .returning();
 
@@ -60,15 +62,16 @@ export default function registerStudentRoutes(app: Express) {
 
     app.put("/students/:id", async (req, res) => {
         const { id } = req.params as { id: string };
-        const { name, email } = req.body as {
+        const { name, email, classId } = req.body as {
             name: string;
             email: string;
+            classId: number;
         };
 
         try {
             const updatedStudent = await db
                 .update(students)
-                .set({ name, email })
+                .set({ name, email, classId })
                 .where(eq(students.id, parseInt(id)))
                 .returning();
 

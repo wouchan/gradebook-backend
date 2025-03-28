@@ -21,7 +21,7 @@ export default function registerTeacherRoutes(app: Express) {
             const teacher = await db
                 .select()
                 .from(teachers)
-                .where(eq(teachers.id, id))
+                .where(eq(teachers.id, parseInt(id)))
                 .limit(1);
 
             if (teacher.length === 0) {
@@ -69,7 +69,7 @@ export default function registerTeacherRoutes(app: Express) {
             const updatedTeacher = await db
                 .update(teachers)
                 .set({ name, email })
-                .where(eq(teachers.id, id))
+                .where(eq(teachers.id, parseInt(id)))
                 .returning();
 
             if (updatedTeacher.length === 0) {
@@ -90,7 +90,7 @@ export default function registerTeacherRoutes(app: Express) {
         try {
             const deletedTeacher = await db
                 .delete(teachers)
-                .where(eq(teachers.id, id))
+                .where(eq(teachers.id, parseInt(id)))
                 .returning();
 
             if (deletedTeacher.length === 0) {

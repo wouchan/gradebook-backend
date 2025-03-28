@@ -21,7 +21,7 @@ export default function registerGradesRoutes(app: Express) {
             const grade = await db
                 .select()
                 .from(grades)
-                .where(eq(grades.id, id))
+                .where(eq(grades.id, parseInt(id)))
                 .limit(1);
 
             if (grade.length === 0) {
@@ -38,8 +38,8 @@ export default function registerGradesRoutes(app: Express) {
 
     app.post("/grades", async (req, res) => {
         const { studentId, subjectId, value } = req.body as {
-            studentId: string;
-            subjectId: string;
+            studentId: number;
+            subjectId: number;
             value: number;
         };
 
@@ -63,8 +63,8 @@ export default function registerGradesRoutes(app: Express) {
     app.put("/grades/:id", async (req, res) => {
         const { id } = req.params as { id: string };
         const { studentId, subjectId, value } = req.body as {
-            studentId: string;
-            subjectId: string;
+            studentId: number;
+            subjectId: number;
             value: number;
         };
 
@@ -72,7 +72,7 @@ export default function registerGradesRoutes(app: Express) {
             const updatedGrade = await db
                 .update(grades)
                 .set({ studentId, subjectId, value })
-                .where(eq(grades.id, id))
+                .where(eq(grades.id, parseInt(id)))
                 .returning();
 
             if (updatedGrade.length === 0) {
@@ -93,7 +93,7 @@ export default function registerGradesRoutes(app: Express) {
         try {
             const deletedGrade = await db
                 .delete(grades)
-                .where(eq(grades.id, id))
+                .where(eq(grades.id, parseInt(id)))
                 .returning();
 
             if (deletedGrade.length === 0) {

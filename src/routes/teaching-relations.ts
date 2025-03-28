@@ -28,9 +28,9 @@ export default function registerClassesRoutes(app: Express) {
                 .from(teachingRelations)
                 .where(
                     and(
-                        eq(teachingRelations.classId, classId),
-                        eq(teachingRelations.subjectId, subjectId)
-                    )
+                        eq(teachingRelations.classId, parseInt(classId)),
+                        eq(teachingRelations.subjectId, parseInt(subjectId)),
+                    ),
                 )
                 .limit(1);
 
@@ -50,9 +50,9 @@ export default function registerClassesRoutes(app: Express) {
 
     app.post("/teaching-relations", async (req, res) => {
         const { classId, subjectId, teacherId } = req.body as {
-            classId: string;
-            subjectId: string;
-            teacherId: string;
+            classId: number;
+            subjectId: number;
+            teacherId: number;
         };
 
         try {
@@ -81,7 +81,7 @@ export default function registerClassesRoutes(app: Express) {
         };
 
         const { teacherId } = req.body as {
-            teacherId: string;
+            teacherId: number;
         };
 
         try {
@@ -90,9 +90,9 @@ export default function registerClassesRoutes(app: Express) {
                 .set({ teacherId })
                 .where(
                     and(
-                        eq(teachingRelations.classId, classId),
-                        eq(teachingRelations.subjectId, subjectId)
-                    )
+                        eq(teachingRelations.classId, parseInt(classId)),
+                        eq(teachingRelations.subjectId, parseInt(subjectId)),
+                    ),
                 )
                 .returning();
 
@@ -121,9 +121,9 @@ export default function registerClassesRoutes(app: Express) {
                 .delete(teachingRelations)
                 .where(
                     and(
-                        eq(teachingRelations.classId, classId),
-                        eq(teachingRelations.subjectId, subjectId)
-                    )
+                        eq(teachingRelations.classId, parseInt(classId)),
+                        eq(teachingRelations.subjectId, parseInt(subjectId)),
+                    ),
                 )
                 .returning();
 

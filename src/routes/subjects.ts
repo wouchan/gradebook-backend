@@ -21,7 +21,7 @@ export default function registerSubjectsRoutes(app: Express) {
             const subject = await db
                 .select()
                 .from(subjects)
-                .where(eq(subjects.id, id))
+                .where(eq(subjects.id, parseInt(id)))
                 .limit(1);
 
             if (subject.length === 0) {
@@ -66,7 +66,7 @@ export default function registerSubjectsRoutes(app: Express) {
             const updatedSubject = await db
                 .update(subjects)
                 .set({ name })
-                .where(eq(subjects.id, id))
+                .where(eq(subjects.id, parseInt(id)))
                 .returning();
 
             if (updatedSubject.length === 0) {
@@ -87,7 +87,7 @@ export default function registerSubjectsRoutes(app: Express) {
         try {
             const deletedSubject = await db
                 .delete(subjects)
-                .where(eq(subjects.id, id))
+                .where(eq(subjects.id, parseInt(id)))
                 .returning();
 
             if (deletedSubject.length === 0) {
