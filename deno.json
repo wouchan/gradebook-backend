@@ -1,0 +1,22 @@
+{
+  "imports": {
+    "dotenv": "npm:dotenv@^16.4.7",
+    "drizzle-orm": "npm:drizzle-orm@^0.41.0",
+    "express": "npm:express@^5.0.1",
+    "pg": "npm:pg@^8.14.1",
+    "@types/pg": "npm:@types/pg@^8.11.11",
+    "@types/express": "npm:@types/express@^5.0.1",
+    "drizzle-kit": "npm:drizzle-kit@^0.30.5",
+    "globals": "npm:globals@^16.0.0"
+  },
+  "fmt": {
+    "indentWidth": 2,
+    "singleQuote": false,
+    "semiColons": true,
+    "useTabs": false
+  },
+  "tasks": {
+    "start": "deno run -A src/index.ts",
+    "migrate": "deno run -A --node-modules-dir npm:drizzle-kit push"
+  }
+}
