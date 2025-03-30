@@ -1,21 +1,22 @@
-import { Express } from "express";
 import { eq } from "drizzle-orm";
 import { db } from "../db/index.ts";
 import { grades } from "../db/schema.ts";
+import { Router } from "@oak/oak/router";
 
-export default function registerGradesRoutes(app: Express) {
-  app.get("/grades", async (req, res) => {
+export default function registerGradesRoutes(router: Router) {
+  router.get("/grades", async (ctx) => {
     try {
       const allGrades = await db.select().from(grades);
-      res.send(allGrades);
+      ctx.response.body = allGrades;
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to fetch grades" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to fetch grades" };
     }
   });
 
-  app.get("/grades/:id", async (req, res) => {
-    const { id } = req.params as { id: string };
+  router.get("/grades/:id", async (ctx) => {
+    const { id } = ctx.params as { id: string };
 
     try {
       const grade = await db
@@ -25,19 +26,20 @@ export default function registerGradesRoutes(app: Express) {
         .limit(1);
 
       if (grade.length === 0) {
-        res.status(404).send({ error: "Grade not found" });
-        return;
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Grade not found" };
+      } else {
+        ctx.response.body = grade[0];
       }
-
-      res.send(grade[0]);
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to fetch grade" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to fetch grade" };
     }
   });
 
-  app.post("/grades", async (req, res) => {
-    const { studentId, subjectId, value } = req.body as {
+  router.post("/grades", async (ctx) => {
+    const { studentId, subjectId, value } = await ctx.request.body.json() as {
       studentId: number;
       subjectId: number;
       value: number;
@@ -53,16 +55,17 @@ export default function registerGradesRoutes(app: Express) {
         })
         .returning();
 
-      res.send(newGrade[0]);
+      ctx.response.body = newGrade[0];
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to create grade" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to create grade" };
     }
   });
 
-  app.put("/grades/:id", async (req, res) => {
-    const { id } = req.params as { id: string };
-    const { studentId, subjectId, value } = req.body as {
+  router.put("/grades/:id", async (ctx) => {
+    const { id } = ctx.params as { id: string };
+    const { studentId, subjectId, value } = await ctx.request.body.json() as {
       studentId: number;
       subjectId: number;
       value: number;
@@ -76,19 +79,20 @@ export default function registerGradesRoutes(app: Express) {
         .returning();
 
       if (updatedGrade.length === 0) {
-        res.status(404).send({ error: "Grade not found" });
-        return;
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Grade not found" };
+      } else {
+        ctx.response.body = updatedGrade[0];
       }
-
-      res.send(updatedGrade[0]);
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to update grade" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to update grade" };
     }
   });
 
-  app.delete("/grades/:id", async (req, res) => {
-    const { id } = req.params as { id: string };
+  router.delete("/grades/:id", async (ctx) => {
+    const { id } = ctx.params as { id: string };
 
     try {
       const deletedGrade = await db
@@ -97,14 +101,15 @@ export default function registerGradesRoutes(app: Express) {
         .returning();
 
       if (deletedGrade.length === 0) {
-        res.status(404).send({ error: "Grade not found" });
-        return;
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Grade not found" };
+      } else {
+        ctx.response.body = { message: "Grade deleted successfully" };
       }
-
-      res.send({ message: "Grade deleted successfully" });
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to delete grade" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to delete grade" };
     }
   });
 }

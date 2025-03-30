@@ -1,29 +1,28 @@
-import { Express } from "express";
 import { and, eq } from "drizzle-orm";
 import { db } from "../db/index.ts";
 import { teachingRelations } from "../db/schema.ts";
+import { Router } from "@oak/oak/router";
 
-export default function registerClassesRoutes(app: Express) {
-  app.get("/teaching-relations", async (req, res) => {
+export default function registerClassesRoutes(router: Router) {
+  router.get("/teaching-relations", async (ctx) => {
     try {
       const allClasses = await db.select().from(teachingRelations);
-      res.send(allClasses);
+      ctx.response.body = allClasses;
     } catch (err) {
       console.log(err);
-      res.status(500).send({
-        error: "Failed to fetch teaching relations",
-      });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to fetch teaching relations" };
     }
   });
 
-  app.get("/teaching-relations/:classId/:subjectId", async (req, res) => {
-    const { classId, subjectId } = req.params as {
+  router.get("/teaching-relations/:classId/:subjectId", async (ctx) => {
+    const { classId, subjectId } = ctx.params as {
       classId: string;
       subjectId: string;
     };
 
     try {
-      const techingRelation = await db
+      const teachingRelation = await db
         .select()
         .from(teachingRelations)
         .where(
@@ -34,22 +33,21 @@ export default function registerClassesRoutes(app: Express) {
         )
         .limit(1);
 
-      if (techingRelation.length === 0) {
-        res.status(404).send({ error: "Teaching relation not found" });
-        return;
+      if (teachingRelation.length === 0) {
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Teaching relation not found" };
+      } else {
+        ctx.response.body = teachingRelation[0];
       }
-
-      res.send(techingRelation[0]);
     } catch (err) {
       console.log(err);
-      res.status(500).send({
-        error: "Failed to fetch teaching relation",
-      });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to fetch teaching relation" };
     }
   });
 
-  app.post("/teaching-relations", async (req, res) => {
-    const { classId, subjectId, teacherId } = req.body as {
+  router.post("/teaching-relations", async (ctx) => {
+    const { classId, subjectId, teacherId } = await ctx.request.body.json() as {
       classId: number;
       subjectId: number;
       teacherId: number;
@@ -65,22 +63,21 @@ export default function registerClassesRoutes(app: Express) {
         })
         .returning();
 
-      res.send(newTeachingRelation[0]);
+      ctx.response.body = newTeachingRelation[0];
     } catch (err) {
       console.log(err);
-      res.status(500).send({
-        error: "Failed to create teaching relation",
-      });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to create teaching relation" };
     }
   });
 
-  app.put("/teaching-relations/:classId/:subjectId", async (req, res) => {
-    const { classId, subjectId } = req.params as {
+  router.put("/teaching-relations/:classId/:subjectId", async (ctx) => {
+    const { classId, subjectId } = ctx.params as {
       classId: string;
       subjectId: string;
     };
 
-    const { teacherId } = req.body as {
+    const { teacherId } = await ctx.request.body.json() as {
       teacherId: number;
     };
 
@@ -97,21 +94,20 @@ export default function registerClassesRoutes(app: Express) {
         .returning();
 
       if (updatedTeachingRelation.length === 0) {
-        res.status(404).send({ error: "Teaching relation not found" });
-        return;
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Teaching relation not found" };
+      } else {
+        ctx.response.body = updatedTeachingRelation[0];
       }
-
-      res.send(updatedTeachingRelation[0]);
     } catch (err) {
       console.log(err);
-      res.status(500).send({
-        error: "Failed to update teaching relation",
-      });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to update teaching relation" };
     }
   });
 
-  app.delete("/teaching-relations/:classId/:subjectId", async (req, res) => {
-    const { classId, subjectId } = req.params as {
+  router.delete("/teaching-relations/:classId/:subjectId", async (ctx) => {
+    const { classId, subjectId } = ctx.params as {
       classId: string;
       subjectId: string;
     };
@@ -128,16 +124,17 @@ export default function registerClassesRoutes(app: Express) {
         .returning();
 
       if (deletedTeachingRelation.length === 0) {
-        res.status(404).send({ error: "Teaching relation not found" });
-        return;
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Teaching relation not found" };
+      } else {
+        ctx.response.body = {
+          message: "Teaching relation deleted successfully",
+        };
       }
-
-      res.send({ message: "Teaching relation deleted successfully" });
     } catch (err) {
       console.log(err);
-      res.status(500).send({
-        error: "Failed to delete teaching relation",
-      });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to delete teaching relation" };
     }
   });
 }

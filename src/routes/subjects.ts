@@ -1,21 +1,22 @@
-import { Express } from "express";
 import { eq } from "drizzle-orm";
 import { db } from "../db/index.ts";
 import { subjects } from "../db/schema.ts";
+import { Router } from "@oak/oak/router";
 
-export default function registerSubjectsRoutes(app: Express) {
-  app.get("/subjects", async (req, res) => {
+export default function registerSubjectsRoutes(router: Router) {
+  router.get("/subjects", async (ctx) => {
     try {
       const allSubjects = await db.select().from(subjects);
-      res.send(allSubjects);
+      ctx.response.body = allSubjects;
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to fetch subjects" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to fetch subjects" };
     }
   });
 
-  app.get("/subjects/:id", async (req, res) => {
-    const { id } = req.params as { id: string };
+  router.get("/subjects/:id", async (ctx) => {
+    const { id } = ctx.params as { id: string };
 
     try {
       const subject = await db
@@ -25,19 +26,20 @@ export default function registerSubjectsRoutes(app: Express) {
         .limit(1);
 
       if (subject.length === 0) {
-        res.status(404).send({ error: "Subject not found" });
-        return;
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Subject not found" };
+      } else {
+        ctx.response.body = subject[0];
       }
-
-      res.send(subject[0]);
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to fetch subject" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to fetch subject" };
     }
   });
 
-  app.post("/subjects", async (req, res) => {
-    const { name } = req.body as {
+  router.post("/subjects", async (ctx) => {
+    const { name } = await ctx.request.body.json() as {
       name: string;
     };
 
@@ -49,16 +51,17 @@ export default function registerSubjectsRoutes(app: Express) {
         })
         .returning();
 
-      res.send(newSubject[0]);
+      ctx.response.body = newSubject[0];
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to create subject" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to create subject" };
     }
   });
 
-  app.put("/subjects/:id", async (req, res) => {
-    const { id } = req.params as { id: string };
-    const { name } = req.body as {
+  router.put("/subjects/:id", async (ctx) => {
+    const { id } = ctx.params as { id: string };
+    const { name } = await ctx.request.body.json() as {
       name: string;
     };
 
@@ -70,19 +73,20 @@ export default function registerSubjectsRoutes(app: Express) {
         .returning();
 
       if (updatedSubject.length === 0) {
-        res.status(404).send({ error: "Subject not found" });
-        return;
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Subject not found" };
+      } else {
+        ctx.response.body = updatedSubject[0];
       }
-
-      res.send(updatedSubject[0]);
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to update subject" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to update subject" };
     }
   });
 
-  app.delete("/subjects/:id", async (req, res) => {
-    const { id } = req.params as { id: string };
+  router.delete("/subjects/:id", async (ctx) => {
+    const { id } = ctx.params as { id: string };
 
     try {
       const deletedSubject = await db
@@ -91,14 +95,15 @@ export default function registerSubjectsRoutes(app: Express) {
         .returning();
 
       if (deletedSubject.length === 0) {
-        res.status(404).send({ error: "Subject not found" });
-        return;
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Subject not found" };
+      } else {
+        ctx.response.body = { message: "Subject deleted successfully" };
       }
-
-      res.send({ message: "Subject deleted successfully" });
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to delete subject" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to delete subject" };
     }
   });
 }

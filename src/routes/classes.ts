@@ -1,21 +1,22 @@
-import { Express } from "express";
 import { eq } from "drizzle-orm";
 import { db } from "../db/index.ts";
 import { classes } from "../db/schema.ts";
+import { Router } from "@oak/oak/router";
 
-export default function registerClassesRoutes(app: Express) {
-  app.get("/classes", async (req, res) => {
+export default function registerClassesRoutes(router: Router) {
+  router.get("/classes", async (ctx) => {
     try {
       const allClasses = await db.select().from(classes);
-      res.send(allClasses);
+      ctx.response.body = allClasses;
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to fetch classes" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to fetch classes" };
     }
   });
 
-  app.get("/classes/:id", async (req, res) => {
-    const { id } = req.params as { id: string };
+  router.get("/classes/:id", async (ctx) => {
+    const { id } = ctx.params as { id: string };
 
     try {
       const schoolClass = await db
@@ -25,19 +26,20 @@ export default function registerClassesRoutes(app: Express) {
         .limit(1);
 
       if (schoolClass.length === 0) {
-        res.status(404).send({ error: "Class not found" });
-        return;
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Class not found" };
+      } else {
+        ctx.response.body = schoolClass[0];
       }
-
-      res.send(schoolClass[0]);
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to fetch class" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to fetch class" };
     }
   });
 
-  app.post("/classes", async (req, res) => {
-    const { name } = req.body as {
+  router.post("/classes", async (ctx) => {
+    const { name } = await ctx.request.body.json() as {
       name: string;
     };
 
@@ -49,16 +51,17 @@ export default function registerClassesRoutes(app: Express) {
         })
         .returning();
 
-      res.send(newClass[0]);
+      ctx.response.body = newClass[0];
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to create class" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to create class" };
     }
   });
 
-  app.put("/classes/:id", async (req, res) => {
-    const { id } = req.params as { id: string };
-    const { name } = req.body as {
+  router.put("/classes/:id", async (ctx) => {
+    const { id } = ctx.params as { id: string };
+    const { name } = await ctx.request.body.json() as {
       name: string;
     };
 
@@ -70,19 +73,20 @@ export default function registerClassesRoutes(app: Express) {
         .returning();
 
       if (updatedClass.length === 0) {
-        res.status(404).send({ error: "Class not found" });
-        return;
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Class not found" };
+      } else {
+        ctx.response.body = updatedClass[0];
       }
-
-      res.send(updatedClass[0]);
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to update class" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to update class" };
     }
   });
 
-  app.delete("/classes/:id", async (req, res) => {
-    const { id } = req.params as { id: string };
+  router.delete("/classes/:id", async (ctx) => {
+    const { id } = ctx.params as { id: string };
 
     try {
       const deletedClass = await db
@@ -91,14 +95,15 @@ export default function registerClassesRoutes(app: Express) {
         .returning();
 
       if (deletedClass.length === 0) {
-        res.status(404).send({ error: "Class not found" });
-        return;
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Class not found" };
+      } else {
+        ctx.response.body = { message: "Class deleted successfully" };
       }
-
-      res.send({ message: "Class deleted successfully" });
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to delete class" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to delete class" };
     }
   });
 }

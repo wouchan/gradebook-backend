@@ -1,21 +1,22 @@
 import "dotenv/config";
-import express from "express";
+import registerGradesRoutes from "./routes/grades.ts";
+import registerClassesRoutes from "./routes/classes.ts";
 import registerStudentRoutes from "./routes/students.ts";
 import registerTeacherRoutes from "./routes/teachers.ts";
-import registerGradesRoutes from "./routes/grades.ts";
 import registerSubjectsRoutes from "./routes/subjects.ts";
-import registerClassesRoutes from "./routes/classes.ts";
+import { Application, Router } from "@oak/oak";
 
-const port = 3000;
-const app = express();
-app.use(express.json());
+const router = new Router();
 
-registerGradesRoutes(app);
-registerStudentRoutes(app);
-registerTeacherRoutes(app);
-registerClassesRoutes(app);
-registerSubjectsRoutes(app);
+registerGradesRoutes(router);
+registerClassesRoutes(router);
+registerStudentRoutes(router);
+registerTeacherRoutes(router);
+registerSubjectsRoutes(router);
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
+const app = new Application();
+
+app.use(router.routes());
+app.use(router.allowedMethods());
+
+app.listen({ port: 3000 });

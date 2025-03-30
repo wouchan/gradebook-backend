@@ -1,21 +1,22 @@
-import { Express } from "express";
 import { eq } from "drizzle-orm";
 import { db } from "../db/index.ts";
 import { teachers } from "../db/schema.ts";
+import { Router } from "@oak/oak/router";
 
-export default function registerTeacherRoutes(app: Express) {
-  app.get("/teachers", async (req, res) => {
+export default function registerTeacherRoutes(router: Router) {
+  router.get("/teachers", async (ctx) => {
     try {
       const allTeachers = await db.select().from(teachers);
-      res.send(allTeachers);
+      ctx.response.body = allTeachers;
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to fetch teachers" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to fetch teachers" };
     }
   });
 
-  app.get("/teachers/:id", async (req, res) => {
-    const { id } = req.params as { id: string };
+  router.get("/teachers/:id", async (ctx) => {
+    const { id } = ctx.params as { id: string };
 
     try {
       const teacher = await db
@@ -25,19 +26,20 @@ export default function registerTeacherRoutes(app: Express) {
         .limit(1);
 
       if (teacher.length === 0) {
-        res.status(404).send({ error: "Teacher not found" });
-        return;
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Teacher not found" };
+      } else {
+        ctx.response.body = teacher[0];
       }
-
-      res.send(teacher[0]);
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to fetch teacher" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to fetch teacher" };
     }
   });
 
-  app.post("/teachers", async (req, res) => {
-    const { name, email } = req.body as {
+  router.post("/teachers", async (ctx) => {
+    const { name, email } = await ctx.request.body.json() as {
       name: string;
       email: string;
     };
@@ -51,16 +53,17 @@ export default function registerTeacherRoutes(app: Express) {
         })
         .returning();
 
-      res.send(newTeacher[0]);
+      ctx.response.body = newTeacher[0];
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to create teacher" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to create teacher" };
     }
   });
 
-  app.put("/teachers/:id", async (req, res) => {
-    const { id } = req.params as { id: string };
-    const { name, email } = req.body as {
+  router.put("/teachers/:id", async (ctx) => {
+    const { id } = ctx.params as { id: string };
+    const { name, email } = await ctx.request.body.json() as {
       name: string;
       email: string;
     };
@@ -73,19 +76,20 @@ export default function registerTeacherRoutes(app: Express) {
         .returning();
 
       if (updatedTeacher.length === 0) {
-        res.status(404).send({ error: "Teacher not found" });
-        return;
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Teacher not found" };
+      } else {
+        ctx.response.body = updatedTeacher[0];
       }
-
-      res.send(updatedTeacher[0]);
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to update teacher" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to update teacher" };
     }
   });
 
-  app.delete("/teachers/:id", async (req, res) => {
-    const { id } = req.params as { id: string };
+  router.delete("/teachers/:id", async (ctx) => {
+    const { id } = ctx.params as { id: string };
 
     try {
       const deletedTeacher = await db
@@ -94,14 +98,15 @@ export default function registerTeacherRoutes(app: Express) {
         .returning();
 
       if (deletedTeacher.length === 0) {
-        res.status(404).send({ error: "Teacher not found" });
-        return;
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Teacher not found" };
+      } else {
+        ctx.response.body = { message: "Teacher deleted successfully" };
       }
-
-      res.send({ message: "Teacher deleted successfully" });
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to delete teacher" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to delete teacher" };
     }
   });
 }

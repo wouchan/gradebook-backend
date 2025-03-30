@@ -1,21 +1,22 @@
-import { Express } from "express";
 import { eq } from "drizzle-orm";
 import { db } from "../db/index.ts";
 import { students } from "../db/schema.ts";
+import { Router } from "@oak/oak/router";
 
-export default function registerStudentRoutes(app: Express) {
-  app.get("/students", async (req, res) => {
+export default function registerStudentRoutes(router: Router) {
+  router.get("/students", async (ctx) => {
     try {
       const allStudents = await db.select().from(students);
-      res.send(allStudents);
+      ctx.response.body = allStudents;
     } catch (err) {
-      console.log(err);
-      res.status(500).send({ error: "Failed to fetch students" });
+      console.log("Database error: ", err);
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to fetch students" };
     }
   });
 
-  app.get("/students/:id", async (req, res) => {
-    const { id } = req.params as { id: string };
+  router.get("/students/:id", async (ctx) => {
+    const { id } = ctx.params as { id: string };
 
     try {
       const student = await db
@@ -25,19 +26,20 @@ export default function registerStudentRoutes(app: Express) {
         .limit(1);
 
       if (student.length === 0) {
-        res.status(404).send({ error: "Student not found" });
-        return;
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Student not found" };
+      } else {
+        ctx.response.body = student[0];
       }
-
-      res.send(student[0]);
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to fetch student" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to fetch student" };
     }
   });
 
-  app.post("/students", async (req, res) => {
-    const { name, email, classId } = req.body as {
+  router.post("/students", async (ctx) => {
+    const { name, email, classId } = await ctx.request.body.json() as {
       name: string;
       email: string;
       classId: number;
@@ -53,16 +55,17 @@ export default function registerStudentRoutes(app: Express) {
         })
         .returning();
 
-      res.send(newStudent[0]);
+      ctx.response.body = newStudent[0];
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to create student" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to create student" };
     }
   });
 
-  app.put("/students/:id", async (req, res) => {
-    const { id } = req.params as { id: string };
-    const { name, email, classId } = req.body as {
+  router.put("/students/:id", async (ctx) => {
+    const { id } = ctx.params as { id: string };
+    const { name, email, classId } = await ctx.request.body.json() as {
       name: string;
       email: string;
       classId: number;
@@ -76,19 +79,20 @@ export default function registerStudentRoutes(app: Express) {
         .returning();
 
       if (updatedStudent.length === 0) {
-        res.status(404).send({ error: "Student not found" });
-        return;
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Student not found" };
+      } else {
+        ctx.response.body = updatedStudent[0];
       }
-
-      res.send(updatedStudent[0]);
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to update student" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to update student" };
     }
   });
 
-  app.delete("/students/:id", async (req, res) => {
-    const { id } = req.params as { id: string };
+  router.delete("/students/:id", async (ctx) => {
+    const { id } = ctx.params as { id: string };
 
     try {
       const deletedStudent = await db
@@ -97,13 +101,15 @@ export default function registerStudentRoutes(app: Express) {
         .returning();
 
       if (deletedStudent.length === 0) {
-        res.status(404).send({ error: "Student not found" });
+        ctx.response.status = 404;
+        ctx.response.body = { error: "Student not found" };
+      } else {
+        ctx.response.body = { message: "Student deleted successfully" };
       }
-
-      res.send({ message: "Student deleted successfully" });
     } catch (err) {
       console.log(err);
-      res.status(500).send({ error: "Failed to delete student" });
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to delete student" };
     }
   });
 }
