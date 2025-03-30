@@ -3,7 +3,7 @@ import { db } from "../db/index.ts";
 import { teachingRelations } from "../db/schema.ts";
 import { Router } from "@oak/oak/router";
 
-export default function registerClassesRoutes(router: Router) {
+export default function registerTechingRelationsRoutes(router: Router) {
   router.get("/teaching-relations", async (ctx) => {
     try {
       const allClasses = await db.select().from(teachingRelations);

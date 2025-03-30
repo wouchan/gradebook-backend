@@ -4,6 +4,7 @@ import registerClassesRoutes from "./routes/classes.ts";
 import registerStudentRoutes from "./routes/students.ts";
 import registerTeacherRoutes from "./routes/teachers.ts";
 import registerSubjectsRoutes from "./routes/subjects.ts";
+import registerTeachingRelationsRoutes from "./routes/teaching-relations.ts";
 import { Application, Router } from "@oak/oak";
 
 const router = new Router();
@@ -13,6 +14,7 @@ registerClassesRoutes(router);
 registerStudentRoutes(router);
 registerTeacherRoutes(router);
 registerSubjectsRoutes(router);
+registerTeachingRelationsRoutes(router);
 
 const app = new Application();
 
