@@ -17,7 +17,6 @@
     "npm:drizzle-kit@*": "0.30.6_esbuild@0.19.12",
     "npm:drizzle-kit@~0.30.5": "0.30.6_esbuild@0.19.12",
     "npm:drizzle-orm@0.41": "0.41.0_@types+pg@8.11.11_pg@8.14.1",
-    "npm:globals@16": "16.0.0",
     "npm:path-to-regexp@^6.3.0": "6.3.0",
     "npm:pg@^8.14.1": "8.14.1"
   },
@@ -414,9 +413,6 @@
         "resolve-pkg-maps"
       ]
     },
-    "globals@16.0.0": {
-      "integrity": "sha512-iInW14XItCXET01CQFqudPOWP2jYMl7T+QRQT+UNcR/iQncN/F0UNpgd76iFkBPgNQb4+X3LV9tLJYzwh+Gl3A=="
-    },
     "isexe@3.1.1": {
       "integrity": "sha512-LpB/54B+/2J5hqQ7imZHfdU31OlgQqx7ZicVlkm9kzg9/w8GKLEcFfJl/t7DCEDueOyBAD6zCCwTO6Fzs0NoEQ=="
     },
@@ -568,7 +564,6 @@
       "npm:dotenv@^16.4.7",
       "npm:drizzle-kit@~0.30.5",
       "npm:drizzle-orm@0.41",
-      "npm:globals@16",
       "npm:pg@^8.14.1"
     ]
   }

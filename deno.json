@@ -6,8 +6,7 @@
     "pg": "npm:pg@^8.14.1",
     "@types/pg": "npm:@types/pg@^8.11.11",
     "@types/express": "npm:@types/express@^5.0.1",
-    "drizzle-kit": "npm:drizzle-kit@^0.30.5",
-    "globals": "npm:globals@^16.0.0"
+    "drizzle-kit": "npm:drizzle-kit@^0.30.5"
   },
   "fmt": {
     "indentWidth": 2,
