@@ -4,7 +4,7 @@ import { classRelations } from "../db/schema.ts";
 import { Router } from "@oak/oak/router";
 
 export default function registerClassRelationsRoutes(router: Router) {
-  router.get("/class-relations", async (ctx) => {
+  router.get("/api/class-relations", async (ctx) => {
     try {
       const allClasses = await db.select().from(classRelations);
       ctx.response.body = allClasses;
@@ -15,7 +15,7 @@ export default function registerClassRelationsRoutes(router: Router) {
     }
   });
 
-  router.get("/class-relations/:id", async (ctx) => {
+  router.get("/api/class-relations/:id", async (ctx) => {
     const { id } = ctx.params as { id: string };
 
     try {
@@ -38,7 +38,7 @@ export default function registerClassRelationsRoutes(router: Router) {
     }
   });
 
-  router.post("/class-relations", async (ctx) => {
+  router.post("/api/class-relations", async (ctx) => {
     const { classId, studentId } = await ctx.request.body.json() as {
       classId: number;
       studentId: number;
@@ -61,7 +61,7 @@ export default function registerClassRelationsRoutes(router: Router) {
     }
   });
 
-  router.put("/class-relations/:id", async (ctx) => {
+  router.put("/api/class-relations/:id", async (ctx) => {
     const { id } = ctx.params as { id: string };
     const { classId, studentId } = await ctx.request.body.json() as {
       classId: number;
@@ -88,7 +88,7 @@ export default function registerClassRelationsRoutes(router: Router) {
     }
   });
 
-  router.delete("/class-relations/:id", async (ctx) => {
+  router.delete("/api/class-relations/:id", async (ctx) => {
     const { id } = ctx.params as { id: string };
 
     try {

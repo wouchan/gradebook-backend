@@ -4,7 +4,7 @@ import { accounts } from "../db/schema.ts";
 import { Router } from "@oak/oak/router";
 
 export default function registerAccountsRoutes(router: Router) {
-  router.get("/accounts", async (ctx) => {
+  router.get("/api/accounts", async (ctx) => {
     try {
       const allAccounts = await db.select().from(accounts);
       ctx.response.body = allAccounts;
@@ -15,7 +15,7 @@ export default function registerAccountsRoutes(router: Router) {
     }
   });
 
-  router.get("/accounts/:id", async (ctx) => {
+  router.get("/api/accounts/:id", async (ctx) => {
     const { id } = ctx.params as { id: string };
 
     try {
@@ -38,7 +38,7 @@ export default function registerAccountsRoutes(router: Router) {
     }
   });
 
-  router.post("/accounts", async (ctx) => {
+  router.post("/api/accounts", async (ctx) => {
     const { name, email, role, password } = await ctx.request.body.json() as {
       name: string;
       email: string;
@@ -71,7 +71,7 @@ export default function registerAccountsRoutes(router: Router) {
     }
   });
 
-  router.put("/accounts/:id", async (ctx) => {
+  router.put("/api/accounts/:id", async (ctx) => {
     const { id } = ctx.params as { id: string };
     const { name, email, role, password } = await ctx.request.body.json() as {
       name: string;
@@ -105,7 +105,7 @@ export default function registerAccountsRoutes(router: Router) {
     }
   });
 
-  router.delete("/accounts/:id", async (ctx) => {
+  router.delete("/api/accounts/:id", async (ctx) => {
     const { id } = ctx.params as { id: string };
 
     try {

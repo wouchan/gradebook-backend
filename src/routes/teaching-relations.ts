@@ -4,7 +4,7 @@ import { teachingRelations } from "../db/schema.ts";
 import { Router } from "@oak/oak/router";
 
 export default function registerTechingRelationsRoutes(router: Router) {
-  router.get("/teaching-relations", async (ctx) => {
+  router.get("/api/teaching-relations", async (ctx) => {
     try {
       const allClasses = await db.select().from(teachingRelations);
       ctx.response.body = allClasses;
@@ -15,7 +15,7 @@ export default function registerTechingRelationsRoutes(router: Router) {
     }
   });
 
-  router.get("/teaching-relations/:classId/:subjectId", async (ctx) => {
+  router.get("/api/teaching-relations/:classId/:subjectId", async (ctx) => {
     const { classId, subjectId } = ctx.params as {
       classId: string;
       subjectId: string;
@@ -46,7 +46,7 @@ export default function registerTechingRelationsRoutes(router: Router) {
     }
   });
 
-  router.post("/teaching-relations", async (ctx) => {
+  router.post("/api/teaching-relations", async (ctx) => {
     const { classId, subjectId, teacherId } = await ctx.request.body.json() as {
       classId: number;
       subjectId: number;
@@ -71,7 +71,7 @@ export default function registerTechingRelationsRoutes(router: Router) {
     }
   });
 
-  router.put("/teaching-relations/:classId/:subjectId", async (ctx) => {
+  router.put("/api/teaching-relations/:classId/:subjectId", async (ctx) => {
     const { classId, subjectId } = ctx.params as {
       classId: string;
       subjectId: string;
@@ -106,7 +106,7 @@ export default function registerTechingRelationsRoutes(router: Router) {
     }
   });
 
-  router.delete("/teaching-relations/:classId/:subjectId", async (ctx) => {
+  router.delete("/api/teaching-relations/:classId/:subjectId", async (ctx) => {
     const { classId, subjectId } = ctx.params as {
       classId: string;
       subjectId: string;

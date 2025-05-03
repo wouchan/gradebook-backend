@@ -4,7 +4,7 @@ import { grades } from "../db/schema.ts";
 import { Router } from "@oak/oak/router";
 
 export default function registerGradesRoutes(router: Router) {
-  router.get("/grades", async (ctx) => {
+  router.get("/api/grades", async (ctx) => {
     try {
       const allGrades = await db.select().from(grades);
       ctx.response.body = allGrades;
@@ -15,7 +15,7 @@ export default function registerGradesRoutes(router: Router) {
     }
   });
 
-  router.get("/grades/:id", async (ctx) => {
+  router.get("/api/grades/:id", async (ctx) => {
     const { id } = ctx.params as { id: string };
 
     try {
@@ -38,7 +38,7 @@ export default function registerGradesRoutes(router: Router) {
     }
   });
 
-  router.post("/grades", async (ctx) => {
+  router.post("/api/grades", async (ctx) => {
     const { studentId, subjectId, value } = await ctx.request.body.json() as {
       studentId: number;
       subjectId: number;
@@ -63,7 +63,7 @@ export default function registerGradesRoutes(router: Router) {
     }
   });
 
-  router.put("/grades/:id", async (ctx) => {
+  router.put("/api/grades/:id", async (ctx) => {
     const { id } = ctx.params as { id: string };
     const { studentId, subjectId, value } = await ctx.request.body.json() as {
       studentId: number;
@@ -91,7 +91,7 @@ export default function registerGradesRoutes(router: Router) {
     }
   });
 
-  router.delete("/grades/:id", async (ctx) => {
+  router.delete("/api/grades/:id", async (ctx) => {
     const { id } = ctx.params as { id: string };
 
     try {

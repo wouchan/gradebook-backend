@@ -4,7 +4,7 @@ import { subjects } from "../db/schema.ts";
 import { Router } from "@oak/oak/router";
 
 export default function registerSubjectsRoutes(router: Router) {
-  router.get("/subjects", async (ctx) => {
+  router.get("/api/subjects", async (ctx) => {
     try {
       const allSubjects = await db.select().from(subjects);
       ctx.response.body = allSubjects;
@@ -15,7 +15,7 @@ export default function registerSubjectsRoutes(router: Router) {
     }
   });
 
-  router.get("/subjects/:id", async (ctx) => {
+  router.get("/api/subjects/:id", async (ctx) => {
     const { id } = ctx.params as { id: string };
 
     try {
@@ -38,7 +38,7 @@ export default function registerSubjectsRoutes(router: Router) {
     }
   });
 
-  router.post("/subjects", async (ctx) => {
+  router.post("/api/subjects", async (ctx) => {
     const { name } = await ctx.request.body.json() as {
       name: string;
     };
@@ -59,7 +59,7 @@ export default function registerSubjectsRoutes(router: Router) {
     }
   });
 
-  router.put("/subjects/:id", async (ctx) => {
+  router.put("/api/subjects/:id", async (ctx) => {
     const { id } = ctx.params as { id: string };
     const { name } = await ctx.request.body.json() as {
       name: string;
@@ -85,7 +85,7 @@ export default function registerSubjectsRoutes(router: Router) {
     }
   });
 
-  router.delete("/subjects/:id", async (ctx) => {
+  router.delete("/api/subjects/:id", async (ctx) => {
     const { id } = ctx.params as { id: string };
 
     try {

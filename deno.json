@@ -1,6 +1,7 @@
 {
   "imports": {
     "@oak/oak": "jsr:@oak/oak@^17.1.4",
+    "@tajpouria/cors": "jsr:@tajpouria/cors@^1.2.1",
     "dotenv": "npm:dotenv@^16.4.7",
     "drizzle-orm": "npm:drizzle-orm@^0.41.0",
     "pg": "npm:pg@^8.14.1",
