@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { InferSelectModel, sql } from "drizzle-orm";
 import {
   check,
   integer,
@@ -18,7 +18,16 @@ export const accounts = pgTable("accounts", {
   email: text("email").notNull().unique(),
   role: roleEnum("role").notNull(),
   salt: text("salt").notNull(),
-  password: text("password").notNull(),
+  password_hash: text("password_hash").notNull(),
+});
+
+export const sessions = pgTable("sessions", {
+  id: text("id").primaryKey(),
+  accountId: serial("account_id").notNull().references(() => accounts.id),
+  expiresAt: timestamp("expires_at", {
+    withTimezone: true,
+    mode: "date",
+  }).notNull(),
 });
 
 export const classes = pgTable("classes", {
@@ -63,3 +72,6 @@ export const grades = pgTable(
     check("value_check_max_six", sql`${table.value} <= 6`),
   ],
 );
+
+export type Account = InferSelectModel<typeof accounts>;
+export type Session = InferSelectModel<typeof sessions>;

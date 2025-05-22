@@ -12,6 +12,8 @@
     "jsr:@std/media-types@1": "1.1.0",
     "jsr:@std/path@1": "1.0.8",
     "jsr:@tajpouria/cors@^1.2.1": "1.2.1",
+    "npm:@oslojs/crypto@^1.0.1": "1.0.1",
+    "npm:@oslojs/encoding@^1.1.0": "1.1.0",
     "npm:@types/express@^5.0.1": "5.0.1",
     "npm:@types/pg@^8.11.11": "8.11.11",
     "npm:dotenv@^16.4.7": "16.4.7",
@@ -318,6 +320,25 @@
       "os": ["win32"],
       "cpu": ["x64"]
     },
+    "@oslojs/asn1@1.0.0": {
+      "integrity": "sha512-zw/wn0sj0j0QKbIXfIlnEcTviaCzYOY3V5rAyjR6YtOByFtJiT574+8p9Wlach0lZH9fddD4yb9laEAIl4vXQA==",
+      "dependencies": [
+        "@oslojs/binary"
+      ]
+    },
+    "@oslojs/binary@1.0.0": {
+      "integrity": "sha512-9RCU6OwXU6p67H4NODbuxv2S3eenuQ4/WFLrsq+K/k682xrznH5EVWA7N4VFk9VYVcbFtKqur5YQQZc0ySGhsQ=="
+    },
+    "@oslojs/crypto@1.0.1": {
+      "integrity": "sha512-7n08G8nWjAr/Yu3vu9zzrd0L9XnrJfpMioQcvCMxBIiF5orECHe5/3J0jmXRVvgfqMm/+4oxlQ+Sq39COYLcNQ==",
+      "dependencies": [
+        "@oslojs/asn1",
+        "@oslojs/binary"
+      ]
+    },
+    "@oslojs/encoding@1.1.0": {
+      "integrity": "sha512-70wQhgYmndg4GCPxPPxPGevRKqTIJ2Nh4OkiMWmDAVYsTQ+Ta7Sq+rPevXyXGdzr30/qZBnyOalCszoMxlyldQ=="
+    },
     "@petamoriken/float16@3.9.2": {
       "integrity": "sha512-VgffxawQde93xKxT3qap3OH+meZf7VaSB5Sqd4Rqc+FP5alWbpOyan/7tRbOAvynjpG3GpdtAuGU/NdhQpmrog=="
     },
@@ -428,33 +449,8 @@
         "pg"
       ],
       "optionalPeers": [
-        "@aws-sdk/client-rds-data@>=3",
-        "@cloudflare/workers-types@>=4",
-        "@electric-sql/pglite@>=0.2.0",
-        "@libsql/client@>=0.10.0",
-        "@libsql/client-wasm@>=0.10.0",
-        "@neondatabase/serverless@>=0.10.0",
-        "@op-engineering/op-sqlite@>=2",
-        "@opentelemetry/api@^1.4.1",
-        "@planetscale/database@>=1",
-        "@prisma/client@*",
-        "@tidbcloud/serverless@*",
-        "@types/better-sqlite3@*",
         "@types/pg",
-        "@types/sql.js@*",
-        "@vercel/postgres@>=0.8.0",
-        "@xata.io/client@*",
-        "better-sqlite3@>=7",
-        "bun-types@*",
-        "expo-sqlite@>=14.0.0",
-        "gel",
-        "knex@*",
-        "kysely@*",
-        "mysql2@>=2",
-        "pg",
-        "postgres@>=3",
-        "sql.js@>=1",
-        "sqlite3@>=5"
+        "pg"
       ]
     },
     "env-paths@3.0.0": {
@@ -613,9 +609,6 @@
       ],
       "optionalDependencies": [
         "pg-cloudflare"
-      ],
-      "optionalPeers": [
-        "pg-native@>=3.0.1"
       ]
     },
     "pgpass@1.0.5": {
@@ -698,6 +691,8 @@
     "dependencies": [
       "jsr:@oak/oak@^17.1.4",
       "jsr:@tajpouria/cors@^1.2.1",
+      "npm:@oslojs/crypto@^1.0.1",
+      "npm:@oslojs/encoding@^1.1.0",
       "npm:@types/express@^5.0.1",
       "npm:@types/pg@^8.11.11",
       "npm:dotenv@^16.4.7",
