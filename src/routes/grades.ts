@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { body, validationResult } from "express-validator";
 import { db } from "../db";
-import { grades, enrollments, classes } from "../db/schema";
+import { grades, enrollments, classes, students, users } from "../db/schema";
 import { eq, and } from "drizzle-orm";
 import { authenticate, authorize } from "../middleware/auth";
 import { AuthRequest } from "../types";
@@ -65,10 +65,18 @@ router.get(
         .select({
           grade: grades,
           enrollment: enrollments,
+          student: {
+            id: students.id,
+            firstName: users.firstName,
+            lastName: users.lastName,
+            email: users.email,
+          },
         })
         .from(grades)
         .innerJoin(enrollments, eq(grades.enrollmentId, enrollments.id))
-        .where(eq(enrollments.classId, classId));
+        .where(eq(enrollments.classId, classId))
+        .innerJoin(students, eq(enrollments.studentId, students.id))
+        .innerJoin(users, eq(students.userId, users.id));
 
       res.json(classGrades);
     } catch (error) {
