@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import cors from "cors";
 import authRoutes from "./routes/auth";
 import userRoutes from "./routes/users";
 import classRoutes from "./routes/classes";
@@ -9,10 +10,21 @@ import studentRoutes from "./routes/students";
 import teacherRoutes from "./routes/teachers";
 import morgan from "morgan";
 
+// CORS configuration
+const corsOptions = {
+  origin: "http://localhost:5173",
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["Authorization"],
+};
+
 const app = express();
 
 // Middleware
 app.use(morgan("tiny"));
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
