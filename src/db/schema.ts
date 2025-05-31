@@ -34,8 +34,6 @@ export const students = pgTable("students", {
   userId: integer("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  studentId: varchar("student_id", { length: 50 }).notNull().unique(),
-  gradeLevel: integer("grade_level").notNull(),
   enrollmentDate: timestamp("enrollment_date").defaultNow().notNull(),
 });
 
@@ -44,23 +42,16 @@ export const teachers = pgTable("teachers", {
   userId: integer("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  employeeId: varchar("employee_id", { length: 50 }).notNull().unique(),
-  department: varchar("department", { length: 100 }),
   hireDate: timestamp("hire_date").defaultNow().notNull(),
 });
 
 export const classes = pgTable("classes", {
   id: serial("id").primaryKey(),
-  name: varchar("name", { length: 200 }).notNull(),
-  code: varchar("code", { length: 50 }).notNull().unique(),
-  description: text("description"),
+  code: varchar("code", { length: 2 }).notNull().unique(),
   teacherId: integer("teacher_id")
     .notNull()
     .references(() => teachers.id),
-  academicYear: varchar("academic_year", { length: 20 }).notNull(),
-  semester: varchar("semester", { length: 20 }).notNull(),
   isActive: boolean("is_active").default(true).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const enrollments = pgTable(

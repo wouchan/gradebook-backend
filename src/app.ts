@@ -1,9 +1,9 @@
 import "dotenv/config";
 import express from "express";
 import authRoutes from "./routes/auth";
-// import userRoutes from "./routes/users";
-// import classRoutes from "./routes/classes";
-// import enrollmentRoutes from "./routes/enrollments";
+import userRoutes from "./routes/users";
+import classRoutes from "./routes/classes";
+import enrollmentRoutes from "./routes/enrollments";
 import gradeRoutes from "./routes/grades";
 import studentRoutes from "./routes/students";
 import teacherRoutes from "./routes/teachers";
@@ -18,9 +18,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/auth", authRoutes);
-// app.use("/api/users", userRoutes);
-// app.use("/api/classes", classRoutes);
-// app.use("/api/enrollments", enrollmentRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/classes", classRoutes);
+app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/grades", gradeRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/teachers", teacherRoutes);

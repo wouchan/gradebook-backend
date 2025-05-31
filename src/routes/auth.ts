@@ -62,31 +62,17 @@ router.post(
   authenticate,
   authorize("admin"),
   body("email").isEmail().normalizeEmail(),
-  body("password").isLength({ min: 6 }),
+  body("password").notEmpty().trim(),
   body("firstName").notEmpty().trim(),
   body("lastName").notEmpty().trim(),
   body("userType").isIn(["student", "teacher", "admin"]),
-  body("studentId").optional().trim(),
-  body("gradeLevel").optional().isInt({ min: 1, max: 12 }),
-  body("employeeId").optional().trim(),
-  body("department").optional().trim(),
   async (req: AuthRequest, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const {
-      email,
-      password,
-      firstName,
-      lastName,
-      userType,
-      studentId,
-      gradeLevel,
-      employeeId,
-      department,
-    } = req.body;
+    const { email, password, firstName, lastName, userType } = req.body;
 
     try {
       // Check if user already exists
@@ -97,41 +83,6 @@ router.post(
         .limit(1);
       if (existingUser) {
         return res.status(409).json({ error: "User already exists" });
-      }
-
-      // Validate role-specific required fields
-      if (userType === "student") {
-        if (!studentId || !gradeLevel) {
-          return res.status(400).json({
-            error: "Student ID and grade level are required for students",
-          });
-        }
-
-        // Check if studentId is unique
-        const [existingStudent] = await db
-          .select()
-          .from(students)
-          .where(eq(students.studentId, studentId))
-          .limit(1);
-        if (existingStudent) {
-          return res.status(409).json({ error: "Student ID already exists" });
-        }
-      } else if (userType === "teacher") {
-        if (!employeeId) {
-          return res
-            .status(400)
-            .json({ error: "Employee ID is required for teachers" });
-        }
-
-        // Check if employeeId is unique
-        const [existingTeacher] = await db
-          .select()
-          .from(teachers)
-          .where(eq(teachers.employeeId, employeeId))
-          .limit(1);
-        if (existingTeacher) {
-          return res.status(409).json({ error: "Employee ID already exists" });
-        }
       }
 
       // Hash password
@@ -155,17 +106,12 @@ router.post(
         if (userType === "student") {
           await tx.insert(students).values({
             userId: newUser.id,
-            studentId: studentId!,
-            gradeLevel: gradeLevel!,
           });
         } else if (userType === "teacher") {
           await tx.insert(teachers).values({
             userId: newUser.id,
-            employeeId: employeeId!,
-            department: department || null,
           });
         }
-        // Admin users don't need additional records
 
         res.status(201).json({
           message: "User created successfully",

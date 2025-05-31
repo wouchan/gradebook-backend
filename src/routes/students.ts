@@ -18,8 +18,6 @@ router.get(
         .select({
           id: students.id,
           userId: students.userId,
-          studentId: students.studentId,
-          gradeLevel: students.gradeLevel,
           enrollmentDate: students.enrollmentDate,
           firstName: users.firstName,
           lastName: users.lastName,
@@ -50,8 +48,6 @@ router.get("/:id", authenticate, async (req: AuthRequest, res: Response) => {
       .select({
         id: students.id,
         userId: students.userId,
-        studentId: students.studentId,
-        gradeLevel: students.gradeLevel,
         enrollmentDate: students.enrollmentDate,
         firstName: users.firstName,
         lastName: users.lastName,

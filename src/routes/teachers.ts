@@ -13,8 +13,6 @@ router.get("/", authenticate, authorize("admin"), async (req, res) => {
       .select({
         id: teachers.id,
         userId: teachers.userId,
-        employeeId: teachers.employeeId,
-        department: teachers.department,
         hireDate: teachers.hireDate,
         firstName: users.firstName,
         lastName: users.lastName,
@@ -39,8 +37,6 @@ router.get("/:id", authenticate, authorize("admin"), async (req, res) => {
       .select({
         id: teachers.id,
         userId: teachers.userId,
-        employeeId: teachers.employeeId,
-        department: teachers.department,
         hireDate: teachers.hireDate,
         firstName: users.firstName,
         lastName: users.lastName,
