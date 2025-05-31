@@ -61,7 +61,7 @@ router.post(
   "/",
   authenticate,
   authorize("admin", "teacher"),
-  body("code").notEmpty().trim(),
+  body("name").notEmpty().trim(),
   body("teacherId").optional().isInt(),
   async (req: AuthRequest, res: Response) => {
     const errors = validationResult(req);
@@ -70,7 +70,7 @@ router.post(
     }
 
     try {
-      const { name, code, teacherId } = req.body;
+      const { name, teacherId } = req.body;
 
       // If teacher is creating, use their ID
       const finalTeacherId =
@@ -84,7 +84,6 @@ router.post(
         .insert(classes)
         .values({
           name,
-          code,
           teacherId: finalTeacherId,
         })
         .returning();
@@ -98,57 +97,55 @@ router.post(
 );
 
 // Update class
-// router.put(
-//   "/:id",
-//   authenticate,
-//   body("isActive").optional().isBoolean(),
-//   async (req: AuthRequest, res: Response) => {
-//     const classId = parseInt(req.params.id);
-//     const errors = validationResult(req);
+router.put(
+  "/:id",
+  authenticate,
+  body("isActive").optional().isBoolean(),
+  async (req: AuthRequest, res: Response) => {
+    const classId = parseInt(req.params.id);
+    const errors = validationResult(req);
 
-//     if (!errors.isEmpty()) {
-//       return res.status(400).json({ errors: errors.array() });
-//     }
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-//     try {
-//       // Check authorization
-//       const [classData] = await db
-//         .select()
-//         .from(classes)
-//         .where(eq(classes.id, classId))
-//         .limit(1);
+    try {
+      // Check authorization
+      const [classData] = await db
+        .select()
+        .from(classes)
+        .where(eq(classes.id, classId))
+        .limit(1);
 
-//       if (!classData) {
-//         return res.status(404).json({ error: "Class not found" });
-//       }
+      if (!classData) {
+        return res.status(404).json({ error: "Class not found" });
+      }
 
-//       if (
-//         req.user!.userType === "teacher" &&
-//         classData.teacherId !== req.user!.teacherId
-//       ) {
-//         return res.status(403).json({ error: "Unauthorized" });
-//       }
+      if (
+        req.user!.userType === "teacher" &&
+        classData.teacherId !== req.user!.teacherId
+      ) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
 
-//       const updateData: any = {};
-//       if (req.body.name !== undefined) updateData.name = req.body.name;
-//       if (req.body.description !== undefined)
-//         updateData.description = req.body.description;
-//       if (req.body.isActive !== undefined)
-//         updateData.isActive = req.body.isActive;
+      const updateData: any = {};
+      if (req.body.name !== undefined) updateData.name = req.body.name;
+      if (req.body.isActive !== undefined)
+        updateData.isActive = req.body.isActive;
 
-//       const [updatedClass] = await db
-//         .update(classes)
-//         .set(updateData)
-//         .where(eq(classes.id, classId))
-//         .returning();
+      const [updatedClass] = await db
+        .update(classes)
+        .set(updateData)
+        .where(eq(classes.id, classId))
+        .returning();
 
-//       res.json(updatedClass);
-//     } catch (error) {
-//       console.error("Error updating class:", error);
-//       res.status(500).json({ error: "Failed to update class" });
-//     }
-//   }
-// );
+      res.json(updatedClass);
+    } catch (error) {
+      console.error("Error updating class:", error);
+      res.status(500).json({ error: "Failed to update class" });
+    }
+  }
+);
 
 // Delete class (admin only)
 router.delete("/:id", authenticate, authorize("admin"), async (req, res) => {

@@ -22,7 +22,7 @@ router.get("/", authenticate, authorize("admin"), async (req, res) => {
           firstName: users.firstName,
           lastName: users.lastName,
         },
-        classCode: classes.code,
+        className: classes.name,
       })
       .from(enrollments)
       .innerJoin(students, eq(enrollments.studentId, students.id))
@@ -107,7 +107,7 @@ router.get(
           isActive: enrollments.isActive,
           class: {
             id: classes.id,
-            code: classes.code,
+            name: classes.name,
           },
         })
         .from(enrollments)
@@ -221,7 +221,7 @@ router.post(
             lastName: users.lastName,
           },
           class: {
-            code: classes.code,
+            name: classes.name,
           },
         })
         .from(enrollments)

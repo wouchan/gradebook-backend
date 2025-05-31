@@ -47,7 +47,7 @@ export const teachers = pgTable("teachers", {
 
 export const classes = pgTable("classes", {
   id: serial("id").primaryKey(),
-  code: varchar("code", { length: 2 }).notNull().unique(),
+  name: varchar("name", { length: 200 }).notNull().unique(),
   teacherId: integer("teacher_id")
     .notNull()
     .references(() => teachers.id),
@@ -84,7 +84,6 @@ export const grades = pgTable("grades", {
     .references(() => enrollments.id, { onDelete: "cascade" }),
   assignmentName: varchar("assignment_name", { length: 200 }).notNull(),
   gradeValue: integer("grade_value").notNull(),
-  maxGrade: integer("max_grade").notNull().default(100),
   weight: integer("weight").default(1),
   comments: text("comments"),
   gradedBy: integer("graded_by")

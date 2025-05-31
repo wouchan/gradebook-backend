@@ -85,8 +85,7 @@ router.post(
   authorize("teacher", "admin"),
   body("enrollmentId").isInt(),
   body("assignmentName").notEmpty().trim(),
-  body("gradeValue").isInt({ min: 0 }),
-  body("maxGrade").optional().isInt({ min: 1 }),
+  body("gradeValue").isInt({ min: 2, max: 5 }),
   body("weight").optional().isInt({ min: 0 }),
   body("comments").optional().trim(),
   async (req: AuthRequest, res: Response) => {
@@ -96,14 +95,8 @@ router.post(
     }
 
     try {
-      const {
-        enrollmentId,
-        assignmentName,
-        gradeValue,
-        maxGrade,
-        weight,
-        comments,
-      } = req.body;
+      const { enrollmentId, assignmentName, gradeValue, weight, comments } =
+        req.body;
 
       // Check if teacher owns the class
       const [enrollment] = await db
@@ -135,7 +128,6 @@ router.post(
           enrollmentId,
           assignmentName,
           gradeValue,
-          maxGrade: maxGrade || 100,
           weight,
           comments,
           gradedBy: req.user!.teacherId!,
