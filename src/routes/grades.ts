@@ -2,7 +2,7 @@ import { Router } from "express";
 import { body, validationResult } from "express-validator";
 import { db } from "../db";
 import { grades, enrollments, classes, students, users } from "../db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { authenticate, authorize } from "../middleware/auth";
 import { AuthRequest } from "../types";
 
