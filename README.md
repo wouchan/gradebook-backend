@@ -1,5 +1,7 @@
 # Gradebook
 
+## Made by Adrian Kafel
+
 A comprehensive web-based gradebook system designed for educational institutions to manage student grades, courses, and user accounts efficiently.
 
 ## Overview
